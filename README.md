@@ -1,29 +1,23 @@
-# Alche Studio — high-fidelity homepage replay
+# IDOI — Virtual Idol / Signal 01
 
-An evidence-backed recreation of the public `https://alche.studio/` homepage. It combines an editable React/Vinext layout with a procedural Three.js glass-D hero and the original environment treatment.
+IDOI 是一个以实时 3D、水晶折射、互动气泡与未来视觉档案构成的虚拟偶像网站。
 
-## Run
+## 本地运行
 
 ```bash
 npm install
 npm run dev
 ```
 
-Open `http://localhost:3000`.
-
-## Verify
+## 构建
 
 ```bash
 npm run build
 ```
 
-The source investigation, replay manifest, QA report, screenshots, and documented fidelity gaps live under `work/alche-replay/.web-shader-extractor/`.
+## 视觉系统
 
-## Scope
-
-- Responsive homepage and fixed navigation
-- Interactive procedural Three.js glass-D emblem
-- News, Works, Mission, Vision, Service, Stellla, and outro states
-- Public source thumbnails, videos, GLTF geometry, and environment maps
-
-The original site's private per-frame fluid, refraction, bloom, and transition internals are represented by an evidence-matched behavioral reconstruction; see `known-gaps.md` for the precise boundary.
+- 首屏：透明光学 D 模型、霓虹折射与光标避让气泡
+- Profile：IDOI 角色设定与信号参数
+- Live：虚拟演出与舞台视觉
+- Archive：角色造型、海报与身份系统视觉数据库
