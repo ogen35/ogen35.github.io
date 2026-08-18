@@ -15,6 +15,12 @@ npm run dev
 npm run build
 ```
 
+## GitHub Pages
+
+推送到 `ogen35/ogen35.github.io` 的 `main` 分支后，GitHub Actions 会自动构建并发布网站：
+
+https://ogen35.github.io/
+
 ## 视觉系统
 
 - 首屏：透明光学 D 模型、霓虹折射与光标避让气泡
