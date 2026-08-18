@@ -63,7 +63,7 @@ export default function Home() {
       renderer.setSize(host.clientWidth, host.clientHeight);
       renderer.outputColorSpace = THREE.SRGBColorSpace;
       renderer.toneMapping = THREE.ACESFilmicToneMapping;
-      renderer.toneMappingExposure = 1.28;
+      renderer.toneMappingExposure = 1.12;
       renderer.domElement.setAttribute("aria-label", "Interactive glass D emblem");
       host.appendChild(renderer.domElement);
 
@@ -113,22 +113,22 @@ export default function Home() {
       dGeometry.computeVertexNormals();
 
       const glass = new THREE.MeshPhysicalMaterial({
-        color: new THREE.Color("#eefcff"),
+        color: new THREE.Color("#13131a"),
         envMap: environment,
-        roughness: 0.025,
-        metalness: 0,
-        transmission: 0.88,
-        thickness: 1.18,
-        ior: 1.52,
+        roughness: 0.012,
+        metalness: 0.12,
+        transmission: 0.56,
+        thickness: 1.58,
+        ior: 1.56,
         dispersion: 1,
-        attenuationColor: new THREE.Color("#8ddcff"),
-        attenuationDistance: 4.6,
+        attenuationColor: new THREE.Color("#030306"),
+        attenuationDistance: 0.92,
         clearcoat: 1,
-        clearcoatRoughness: 0.01,
-        iridescence: 1,
-        iridescenceIOR: 1.42,
-        iridescenceThicknessRange: [120, 780],
-        envMapIntensity: 4.2,
+        clearcoatRoughness: 0.006,
+        iridescence: 0.34,
+        iridescenceIOR: 1.48,
+        iridescenceThicknessRange: [90, 420],
+        envMapIntensity: 5.2,
         side: THREE.DoubleSide,
       });
       const dMesh = new THREE.Mesh(dGeometry, glass);
@@ -138,17 +138,17 @@ export default function Home() {
       const innerGlow = new THREE.Mesh(
         dGeometry.clone(),
         new THREE.MeshPhysicalMaterial({
-          color: new THREE.Color("#22084f"),
-          roughness: 0.08,
-          metalness: 0.04,
-          transmission: 0.34,
+          color: new THREE.Color("#020204"),
+          roughness: 0.018,
+          metalness: 0.5,
+          transmission: 0.08,
           transparent: true,
-          opacity: 0.28,
+          opacity: 0.56,
           envMap: environment,
-          envMapIntensity: 3.1,
-          iridescence: 1,
-          iridescenceIOR: 1.55,
-          iridescenceThicknessRange: [180, 920],
+          envMapIntensity: 4.4,
+          iridescence: 0.24,
+          iridescenceIOR: 1.52,
+          iridescenceThicknessRange: [90, 360],
           side: THREE.BackSide,
         }),
       );
@@ -157,9 +157,21 @@ export default function Home() {
 
       const edge = new THREE.LineSegments(
         new THREE.EdgesGeometry(dGeometry, 21),
-        new THREE.LineBasicMaterial({ color: 0xcffcff, transparent: true, opacity: 0.86 }),
+        new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.58 }),
       );
       logoRoot.add(edge);
+
+      const prismGeometry = new THREE.EdgesGeometry(dGeometry, 18);
+      const redEdgeMaterial = new THREE.LineBasicMaterial({ color: 0xff2a36, transparent: true, opacity: 0.34, blending: THREE.AdditiveBlending });
+      const greenEdgeMaterial = new THREE.LineBasicMaterial({ color: 0x59ff83, transparent: true, opacity: 0.3, blending: THREE.AdditiveBlending });
+      const blueEdgeMaterial = new THREE.LineBasicMaterial({ color: 0x287dff, transparent: true, opacity: 0.38, blending: THREE.AdditiveBlending });
+      const redEdge = new THREE.LineSegments(prismGeometry, redEdgeMaterial);
+      redEdge.position.set(0.018, -0.006, -0.018);
+      const greenEdge = new THREE.LineSegments(prismGeometry, greenEdgeMaterial);
+      greenEdge.position.set(-0.014, 0.014, 0.008);
+      const blueEdge = new THREE.LineSegments(prismGeometry, blueEdgeMaterial);
+      blueEdge.position.set(-0.008, -0.012, 0.022);
+      logoRoot.add(redEdge, greenEdge, blueEdge);
 
       let particleSeed = 2719;
       const random = () => {
@@ -168,7 +180,7 @@ export default function Home() {
       };
       const particlePositions: number[] = [];
       const particleColors: number[] = [];
-      for (let attempts = 0; attempts < 4200 && particlePositions.length < 1080; attempts += 1) {
+      for (let attempts = 0; attempts < 3200 && particlePositions.length < 450; attempts += 1) {
         const y = random() * 3.74 - 1.87;
         const x = random() * 3.3 - 1.02;
         const outerRight = -0.08 + 2.29 * Math.sqrt(Math.max(0, 1 - (y / 2.02) ** 2));
@@ -177,7 +189,7 @@ export default function Home() {
         const insideCounter = Math.abs(y) < 1.02 && x > -0.16 && x < innerRight;
         if (insideOuter && !insideCounter) {
           particlePositions.push(x, y, random() * 0.56 - 0.28);
-          const particleColor = new THREE.Color().setHSL(0.48 + random() * 0.46, 0.92, 0.68 + random() * 0.22);
+          const particleColor = new THREE.Color().setHSL(random(), 0.96, 0.58 + random() * 0.26);
           particleColors.push(particleColor.r, particleColor.g, particleColor.b);
         }
       }
@@ -188,9 +200,9 @@ export default function Home() {
         particleGeometry,
         new THREE.PointsMaterial({
           vertexColors: true,
-          size: 0.021,
+          size: 0.012,
           transparent: true,
-          opacity: 0.9,
+          opacity: 0.44,
           depthWrite: false,
           blending: THREE.AdditiveBlending,
           sizeAttenuation: true,
@@ -198,19 +210,22 @@ export default function Home() {
       );
       logoRoot.add(sparkles);
 
-      const whiteKey = new THREE.PointLight(0xe8fbff, 28, 20);
+      const whiteKey = new THREE.PointLight(0xffffff, 38, 20);
       whiteKey.position.set(-4.3, 1.2, 4.6);
       scene.add(whiteKey);
-      const cyanLight = new THREE.PointLight(0x28e7ff, 44, 16);
-      cyanLight.position.set(-2.8, -1.4, 3.1);
-      scene.add(cyanLight);
-      const magentaLight = new THREE.PointLight(0xff2ed1, 52, 16);
-      magentaLight.position.set(3.1, 1.2, 3.4);
-      scene.add(magentaLight);
-      const violetLight = new THREE.PointLight(0x733cff, 38, 14);
-      violetLight.position.set(0.5, -3.2, 2.2);
-      scene.add(violetLight);
-      scene.add(new THREE.AmbientLight(0xb9d8ff, 0.22));
+      const topHighlight = new THREE.PointLight(0xffffff, 64, 16);
+      topHighlight.position.set(0, 4.5, 2.7);
+      scene.add(topHighlight);
+      const redLight = new THREE.PointLight(0xff2338, 16, 13);
+      redLight.position.set(-2.8, -1.2, 2.4);
+      scene.add(redLight);
+      const greenLight = new THREE.PointLight(0x35ff76, 13, 13);
+      greenLight.position.set(2.7, -0.7, 2.1);
+      scene.add(greenLight);
+      const blueLight = new THREE.PointLight(0x2575ff, 18, 13);
+      blueLight.position.set(0.7, 2.5, 2.6);
+      scene.add(blueLight);
+      scene.add(new THREE.AmbientLight(0xdde5ff, 0.09));
       setReady(true);
 
       const pointer = new THREE.Vector2();
@@ -235,9 +250,12 @@ export default function Home() {
         logoRoot.rotation.y += ((Math.sin(t * 0.17) * 0.07 + pointer.x * 0.18) - logoRoot.rotation.y) * 0.04;
         logoRoot.position.y = -0.26 + Math.sin(t * 0.48) * 0.035;
         sparkles.rotation.z = Math.sin(t * 0.16) * 0.014;
-        cyanLight.intensity = 44 + Math.sin(t * 0.72) * 8;
-        magentaLight.intensity = 52 + Math.sin(t * 0.61 + 1.4) * 10;
-        violetLight.intensity = 38 + Math.sin(t * 0.83 + 2.1) * 7;
+        redEdgeMaterial.opacity = 0.28 + (Math.sin(t * 0.77) + 1) * 0.07;
+        greenEdgeMaterial.opacity = 0.25 + (Math.sin(t * 0.69 + 2) + 1) * 0.06;
+        blueEdgeMaterial.opacity = 0.31 + (Math.sin(t * 0.84 + 4) + 1) * 0.07;
+        redLight.intensity = 14 + Math.sin(t * 0.72) * 4;
+        greenLight.intensity = 12 + Math.sin(t * 0.61 + 1.4) * 3;
+        blueLight.intensity = 16 + Math.sin(t * 0.83 + 2.1) * 4;
         renderer.render(scene, camera);
         frame = requestAnimationFrame(render);
       };
@@ -329,7 +347,7 @@ export default function Home() {
         </div>
 
         <div className="debug-panel material-panel" aria-hidden="true">
-          <b>D Crystal Material</b><span>roughness <i style={{ width: "12%" }} /> 0.025</span><span>transmission <i style={{ width: "88%" }} /> 0.88</span><span>color <em style={{ background: "#8ddcff" }} /> {'{r:141, g:220, b:255}'}</span>
+          <b>D Prismatic Crystal</b><span>roughness <i style={{ width: "8%" }} /> 0.012</span><span>transmission <i style={{ width: "56%" }} /> 0.56</span><span>color <em style={{ background: "#13131a" }} /> {'{r:19, g:19, b:26}'}</span>
         </div>
         <div className="debug-panel quaternion-panel" aria-hidden="true">
           <b>MainLogo Quaternion</b><span className="quat-values">● &nbsp; .00&nbsp; .00&nbsp; .00&nbsp; 1.0</span><div className="quat-orbit"><i>X</i><i>Y</i><i>Z</i></div><button type="button" tabIndex={-1}>Reset Quaternion</button>
