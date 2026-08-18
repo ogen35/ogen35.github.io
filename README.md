@@ -1,6 +1,6 @@
 # Alche Studio — high-fidelity homepage replay
 
-An evidence-backed recreation of the public `https://alche.studio/` homepage. It combines an editable React/Vinext layout with a Three.js hero built from the public Alche geometry and environment assets.
+An evidence-backed recreation of the public `https://alche.studio/` homepage. It combines an editable React/Vinext layout with a procedural Three.js glass-D hero and the original environment treatment.
 
 ## Run
 
@@ -22,7 +22,7 @@ The source investigation, replay manifest, QA report, screenshots, and documente
 ## Scope
 
 - Responsive homepage and fixed navigation
-- Interactive Three.js hero emblem
+- Interactive procedural Three.js glass-D emblem
 - News, Works, Mission, Vision, Service, Stellla, and outro states
 - Public source thumbnails, videos, GLTF geometry, and environment maps
 

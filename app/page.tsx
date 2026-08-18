@@ -55,7 +55,6 @@ export default function Home() {
 
     async function mountScene() {
       const THREE = await import("three");
-      const { GLTFLoader } = await import("three/examples/jsm/loaders/GLTFLoader.js");
       const host = canvasHostRef.current;
       if (!host || disposed) return;
 
@@ -65,7 +64,7 @@ export default function Home() {
       renderer.outputColorSpace = THREE.SRGBColorSpace;
       renderer.toneMapping = THREE.ACESFilmicToneMapping;
       renderer.toneMappingExposure = 1.15;
-      renderer.domElement.setAttribute("aria-label", "Interactive Alche emblem");
+      renderer.domElement.setAttribute("aria-label", "Interactive glass D emblem");
       host.appendChild(renderer.domElement);
 
       const scene = new THREE.Scene();
@@ -78,93 +77,125 @@ export default function Home() {
       environment.colorSpace = THREE.SRGBColorSpace;
       scene.environment = environment;
 
-      const patternCanvas = document.createElement("canvas");
-      patternCanvas.width = 512;
-      patternCanvas.height = 512;
-      const patternContext = patternCanvas.getContext("2d");
-      let textureSeed = 913;
-      const textureRandom = () => {
-        textureSeed = (textureSeed * 16807) % 2147483647;
-        return (textureSeed - 1) / 2147483646;
-      };
-      if (patternContext) {
-        patternContext.fillStyle = "#060708";
-        patternContext.fillRect(0, 0, 512, 512);
-        for (let index = 0; index < 62; index += 1) {
-          const x = textureRandom() * 590 - 40;
-          const y = textureRandom() * 590 - 40;
-          const width = 18 + textureRandom() * 135;
-          const height = 10 + textureRandom() * 62;
-          patternContext.save();
-          patternContext.translate(x, y);
-          patternContext.rotate((-0.55 + textureRandom() * 1.1));
-          patternContext.globalAlpha = 0.12 + textureRandom() * 0.72;
-          patternContext.fillStyle = textureRandom() > 0.47 ? "#f7f7f2" : "#15181a";
-          patternContext.fillRect(-width / 2, -height / 2, width, height);
-          patternContext.restore();
-        }
-        patternContext.globalCompositeOperation = "screen";
-        for (let grain = 0; grain < 210; grain += 1) {
-          patternContext.globalAlpha = 0.035 + textureRandom() * 0.22;
-          patternContext.fillStyle = textureRandom() > 0.2 ? "#ffffff" : "#446c92";
-          patternContext.fillRect(textureRandom() * 512, textureRandom() * 512, 3 + textureRandom() * 48, 1 + textureRandom() * 9);
-        }
-        patternContext.globalCompositeOperation = "screen";
-        for (let line = 0; line < 18; line += 1) {
-          patternContext.strokeStyle = `rgba(${line % 3 === 0 ? "120,170,255" : "255,255,255"},${0.05 + textureRandom() * 0.19})`;
-          patternContext.lineWidth = 1 + textureRandom() * 4;
-          patternContext.beginPath();
-          patternContext.moveTo(-30, textureRandom() * 512);
-          patternContext.bezierCurveTo(140, textureRandom() * 512, 330, textureRandom() * 512, 550, textureRandom() * 512);
-          patternContext.stroke();
-        }
-      }
-      const patternTexture = new THREE.CanvasTexture(patternCanvas);
-      patternTexture.colorSpace = THREE.SRGBColorSpace;
-      patternTexture.wrapS = THREE.RepeatWrapping;
-      patternTexture.wrapT = THREE.MirroredRepeatWrapping;
-
       const logoRoot = new THREE.Group();
+      logoRoot.scale.setScalar(1.22);
+      logoRoot.rotation.x = -0.055;
       scene.add(logoRoot);
 
-      const loader = new GLTFLoader();
-      loader.load("/assets/scene.glb", (gltf) => {
-        if (disposed) return;
-        const logo = gltf.scene.getObjectByName("Alche_A") as THREE.Mesh | undefined;
-        const outline = gltf.scene.getObjectByName("Alche_Outline") as THREE.Mesh | undefined;
-        if (!logo?.geometry) return;
+      const dShape = new THREE.Shape();
+      dShape.moveTo(-1.48, -2.02);
+      dShape.lineTo(-1.48, 2.02);
+      dShape.lineTo(-0.18, 2.02);
+      dShape.bezierCurveTo(1.62, 2.02, 2.34, 1.08, 2.34, 0);
+      dShape.bezierCurveTo(2.34, -1.08, 1.62, -2.02, -0.18, -2.02);
+      dShape.closePath();
 
-        const glass = new THREE.MeshPhysicalMaterial({
-          color: new THREE.Color(1, 1, 1),
-          map: patternTexture,
-          bumpMap: patternTexture,
-          bumpScale: 0.035,
-          envMap: environment,
-          roughness: 0.1,
-          metalness: 0.28,
-          transmission: 0.06,
-          thickness: 0.55,
-          ior: 1.38,
-          dispersion: 0.9,
-          clearcoat: 1,
-          clearcoatRoughness: 0.08,
-          iridescence: 0.72,
-          iridescenceIOR: 1.5,
-          envMapIntensity: 2.4,
-          side: THREE.DoubleSide,
-        });
-        const mesh = new THREE.Mesh(logo.geometry, glass);
-        mesh.scale.setScalar(12.4);
-        logoRoot.add(mesh);
+      const counter = new THREE.Path();
+      counter.moveTo(-0.02, -0.98);
+      counter.lineTo(0.24, -0.98);
+      counter.bezierCurveTo(0.98, -0.98, 1.28, -0.54, 1.28, 0);
+      counter.bezierCurveTo(1.28, 0.54, 0.98, 0.98, 0.24, 0.98);
+      counter.lineTo(-0.02, 0.98);
+      counter.closePath();
+      dShape.holes.push(counter);
 
-        if (outline?.geometry) {
-          const edgeMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.24, wireframe: true });
-          const edge = new THREE.Mesh(outline.geometry, edgeMaterial);
-          edge.scale.setScalar(12.4);
-          logoRoot.add(edge);
-        }
-        setReady(true);
+      const dGeometry = new THREE.ExtrudeGeometry(dShape, {
+        depth: 0.82,
+        steps: 1,
+        curveSegments: 36,
+        bevelEnabled: true,
+        bevelThickness: 0.17,
+        bevelSize: 0.16,
+        bevelOffset: -0.035,
+        bevelSegments: 8,
       });
+      dGeometry.center();
+      dGeometry.computeVertexNormals();
+
+      const glass = new THREE.MeshPhysicalMaterial({
+        color: new THREE.Color("#6c4935"),
+        envMap: environment,
+        roughness: 0.055,
+        metalness: 0.06,
+        transmission: 0.64,
+        thickness: 1.45,
+        ior: 1.48,
+        dispersion: 0.78,
+        attenuationColor: new THREE.Color("#6f3518"),
+        attenuationDistance: 2.5,
+        clearcoat: 1,
+        clearcoatRoughness: 0.025,
+        iridescence: 0.18,
+        iridescenceIOR: 1.33,
+        envMapIntensity: 3.3,
+        side: THREE.DoubleSide,
+      });
+      const dMesh = new THREE.Mesh(dGeometry, glass);
+      dMesh.castShadow = true;
+      logoRoot.add(dMesh);
+
+      const innerGlow = new THREE.Mesh(
+        dGeometry.clone(),
+        new THREE.MeshPhysicalMaterial({
+          color: new THREE.Color("#b96e35"),
+          roughness: 0.18,
+          metalness: 0.12,
+          transmission: 0.16,
+          transparent: true,
+          opacity: 0.2,
+          envMap: environment,
+          envMapIntensity: 1.8,
+          side: THREE.BackSide,
+        }),
+      );
+      innerGlow.scale.set(0.965, 0.965, 0.88);
+      logoRoot.add(innerGlow);
+
+      const edge = new THREE.LineSegments(
+        new THREE.EdgesGeometry(dGeometry, 21),
+        new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.68 }),
+      );
+      logoRoot.add(edge);
+
+      let particleSeed = 2719;
+      const random = () => {
+        particleSeed = (particleSeed * 16807) % 2147483647;
+        return (particleSeed - 1) / 2147483646;
+      };
+      const particlePositions: number[] = [];
+      for (let attempts = 0; attempts < 4200 && particlePositions.length < 1080; attempts += 1) {
+        const y = random() * 3.74 - 1.87;
+        const x = random() * 3.58 - 1.35;
+        const outerRight = -0.08 + 2.29 * Math.sqrt(Math.max(0, 1 - (y / 2.02) ** 2));
+        const insideOuter = x <= outerRight;
+        const innerRight = 0.12 + 1.16 * Math.sqrt(Math.max(0, 1 - (y / 0.98) ** 2));
+        const insideCounter = Math.abs(y) < 0.98 && x > -0.02 && x < innerRight;
+        if (insideOuter && !insideCounter) particlePositions.push(x, y, random() * 0.56 - 0.28);
+      }
+      const particleGeometry = new THREE.BufferGeometry();
+      particleGeometry.setAttribute("position", new THREE.Float32BufferAttribute(particlePositions, 3));
+      const sparkles = new THREE.Points(
+        particleGeometry,
+        new THREE.PointsMaterial({
+          color: 0xffd4a3,
+          size: 0.018,
+          transparent: true,
+          opacity: 0.78,
+          depthWrite: false,
+          blending: THREE.AdditiveBlending,
+          sizeAttenuation: true,
+        }),
+      );
+      logoRoot.add(sparkles);
+
+      const whiteKey = new THREE.PointLight(0xd9efff, 22, 20);
+      whiteKey.position.set(-4.3, 1.2, 4.6);
+      scene.add(whiteKey);
+      const amberFill = new THREE.PointLight(0xff7a2d, 34, 16);
+      amberFill.position.set(3.2, -1.8, 3.4);
+      scene.add(amberFill);
+      scene.add(new THREE.AmbientLight(0xffffff, 0.18));
+      setReady(true);
 
       const pointer = new THREE.Vector2();
       const pointerTarget = new THREE.Vector2();
@@ -187,8 +218,7 @@ export default function Home() {
         logoRoot.rotation.x += ((-0.055 + pointer.y * 0.11) - logoRoot.rotation.x) * 0.035;
         logoRoot.rotation.y += ((Math.sin(t * 0.17) * 0.07 + pointer.x * 0.18) - logoRoot.rotation.y) * 0.04;
         logoRoot.position.y = -0.26 + Math.sin(t * 0.48) * 0.035;
-        patternTexture.offset.x = (t * 0.007) % 1;
-        patternTexture.offset.y = Math.sin(t * 0.11) * 0.025;
+        sparkles.rotation.z = Math.sin(t * 0.16) * 0.014;
         renderer.render(scene, camera);
         frame = requestAnimationFrame(render);
       };
@@ -198,9 +228,14 @@ export default function Home() {
         cancelAnimationFrame(frame);
         window.removeEventListener("pointermove", onPointerMove);
         window.removeEventListener("resize", onResize);
+        logoRoot.traverse((object) => {
+          const renderable = object as THREE.Mesh;
+          renderable.geometry?.dispose?.();
+          const materials = Array.isArray(renderable.material) ? renderable.material : renderable.material ? [renderable.material] : [];
+          materials.forEach((material) => material.dispose());
+        });
         renderer.dispose();
         environment.dispose();
-        patternTexture.dispose();
         renderer.domElement.remove();
       };
     }
@@ -265,7 +300,7 @@ export default function Home() {
         <div className="hero-grid" aria-hidden="true" />
         <div className="hero-blocks" aria-hidden="true"><i /><i /><i /><i /><i /><i /><i /></div>
         <div className="hero-word" aria-hidden="true">ALCHE</div>
-        <div ref={canvasHostRef} className={`hero-canvas ${ready ? "is-ready" : ""}`} />
+        <div ref={canvasHostRef} className={`hero-canvas ${ready ? "is-ready" : ""}`} aria-label="Interactive smoky glass letter D" />
 
         <div className="news-panel" id="news">
           <span className="eyebrow">NEWS</span>
@@ -275,7 +310,7 @@ export default function Home() {
         </div>
 
         <div className="debug-panel material-panel" aria-hidden="true">
-          <b>MainLogo Material</b><span>roughness <i style={{ width: "28%" }} /> 0.10</span><span>noiseScale <i style={{ width: "64%" }} /> 9.0</span><span>color <em /> {'{r:255, g:255, b:255}'}</span>
+          <b>D Glass Material</b><span>roughness <i style={{ width: "18%" }} /> 0.055</span><span>transmission <i style={{ width: "64%" }} /> 0.64</span><span>color <em style={{ background: "#6c4935" }} /> {'{r:108, g:73, b:53}'}</span>
         </div>
         <div className="debug-panel quaternion-panel" aria-hidden="true">
           <b>MainLogo Quaternion</b><span className="quat-values">● &nbsp; .00&nbsp; .00&nbsp; .00&nbsp; 1.0</span><div className="quat-orbit"><i>X</i><i>Y</i><i>Z</i></div><button type="button" tabIndex={-1}>Reset Quaternion</button>
