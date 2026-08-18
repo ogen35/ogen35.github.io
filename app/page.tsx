@@ -55,6 +55,13 @@ export default function Home() {
 
     async function mountScene() {
       const THREE = await import("three");
+      const [{ EffectComposer }, { RenderPass }, { UnrealBloomPass }, { ShaderPass }, { RGBShiftShader }] = await Promise.all([
+        import("three/examples/jsm/postprocessing/EffectComposer.js"),
+        import("three/examples/jsm/postprocessing/RenderPass.js"),
+        import("three/examples/jsm/postprocessing/UnrealBloomPass.js"),
+        import("three/examples/jsm/postprocessing/ShaderPass.js"),
+        import("three/examples/jsm/shaders/RGBShiftShader.js"),
+      ]);
       const host = canvasHostRef.current;
       if (!host || disposed) return;
 
@@ -63,13 +70,27 @@ export default function Home() {
       renderer.setSize(host.clientWidth, host.clientHeight);
       renderer.outputColorSpace = THREE.SRGBColorSpace;
       renderer.toneMapping = THREE.ACESFilmicToneMapping;
-      renderer.toneMappingExposure = 1.12;
+      renderer.toneMappingExposure = 1.24;
+      renderer.setClearColor(0x000000, 0);
       renderer.domElement.setAttribute("aria-label", "Interactive glass D emblem");
       host.appendChild(renderer.domElement);
 
       const scene = new THREE.Scene();
       const camera = new THREE.PerspectiveCamera(42, host.clientWidth / host.clientHeight, 0.1, 100);
       camera.position.set(0, 0, 9.4);
+
+      const composer = new EffectComposer(renderer);
+      composer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+      composer.setSize(host.clientWidth, host.clientHeight);
+      const renderPass = new RenderPass(scene, camera);
+      renderPass.clearAlpha = 0;
+      composer.addPass(renderPass);
+      const bloomPass = new UnrealBloomPass(new THREE.Vector2(host.clientWidth, host.clientHeight), 0.62, 0.34, 0.82);
+      composer.addPass(bloomPass);
+      const rgbShiftPass = new ShaderPass(RGBShiftShader);
+      rgbShiftPass.uniforms.amount.value = 0.00145;
+      rgbShiftPass.uniforms.angle.value = 0.42;
+      composer.addPass(rgbShiftPass);
 
       const environment = new THREE.CubeTextureLoader()
         .setPath("/assets/envmap/")
@@ -113,22 +134,25 @@ export default function Home() {
       dGeometry.computeVertexNormals();
 
       const glass = new THREE.MeshPhysicalMaterial({
-        color: new THREE.Color("#13131a"),
+        color: new THREE.Color("#edf8ff"),
         envMap: environment,
-        roughness: 0.012,
-        metalness: 0.12,
-        transmission: 0.56,
-        thickness: 1.58,
-        ior: 1.56,
+        roughness: 0.004,
+        metalness: 0,
+        transmission: 0.96,
+        thickness: 0.72,
+        ior: 1.62,
         dispersion: 1,
-        attenuationColor: new THREE.Color("#030306"),
-        attenuationDistance: 0.92,
+        attenuationColor: new THREE.Color("#e8f7ff"),
+        attenuationDistance: 14,
         clearcoat: 1,
-        clearcoatRoughness: 0.006,
-        iridescence: 0.34,
-        iridescenceIOR: 1.48,
-        iridescenceThicknessRange: [90, 420],
-        envMapIntensity: 5.2,
+        clearcoatRoughness: 0.002,
+        iridescence: 0.58,
+        iridescenceIOR: 1.5,
+        iridescenceThicknessRange: [80, 520],
+        envMapIntensity: 6.4,
+        transparent: true,
+        opacity: 0.58,
+        depthWrite: false,
         side: THREE.DoubleSide,
       });
       const dMesh = new THREE.Mesh(dGeometry, glass);
@@ -138,17 +162,18 @@ export default function Home() {
       const innerGlow = new THREE.Mesh(
         dGeometry.clone(),
         new THREE.MeshPhysicalMaterial({
-          color: new THREE.Color("#020204"),
-          roughness: 0.018,
-          metalness: 0.5,
-          transmission: 0.08,
+          color: new THREE.Color("#d9eeff"),
+          roughness: 0.008,
+          metalness: 0,
+          transmission: 0.86,
           transparent: true,
-          opacity: 0.56,
+          opacity: 0.1,
           envMap: environment,
-          envMapIntensity: 4.4,
-          iridescence: 0.24,
+          envMapIntensity: 5.6,
+          iridescence: 0.5,
           iridescenceIOR: 1.52,
-          iridescenceThicknessRange: [90, 360],
+          iridescenceThicknessRange: [80, 480],
+          depthWrite: false,
           side: THREE.BackSide,
         }),
       );
@@ -157,14 +182,14 @@ export default function Home() {
 
       const edge = new THREE.LineSegments(
         new THREE.EdgesGeometry(dGeometry, 21),
-        new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.58 }),
+        new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.88, blending: THREE.AdditiveBlending }),
       );
       logoRoot.add(edge);
 
       const prismGeometry = new THREE.EdgesGeometry(dGeometry, 18);
-      const redEdgeMaterial = new THREE.LineBasicMaterial({ color: 0xff2a36, transparent: true, opacity: 0.34, blending: THREE.AdditiveBlending });
-      const greenEdgeMaterial = new THREE.LineBasicMaterial({ color: 0x59ff83, transparent: true, opacity: 0.3, blending: THREE.AdditiveBlending });
-      const blueEdgeMaterial = new THREE.LineBasicMaterial({ color: 0x287dff, transparent: true, opacity: 0.38, blending: THREE.AdditiveBlending });
+      const redEdgeMaterial = new THREE.LineBasicMaterial({ color: 0xff1838, transparent: true, opacity: 0.46, blending: THREE.AdditiveBlending });
+      const greenEdgeMaterial = new THREE.LineBasicMaterial({ color: 0x38ff74, transparent: true, opacity: 0.42, blending: THREE.AdditiveBlending });
+      const blueEdgeMaterial = new THREE.LineBasicMaterial({ color: 0x1778ff, transparent: true, opacity: 0.52, blending: THREE.AdditiveBlending });
       const redEdge = new THREE.LineSegments(prismGeometry, redEdgeMaterial);
       redEdge.position.set(0.018, -0.006, -0.018);
       const greenEdge = new THREE.LineSegments(prismGeometry, greenEdgeMaterial);
@@ -202,7 +227,7 @@ export default function Home() {
           vertexColors: true,
           size: 0.012,
           transparent: true,
-          opacity: 0.44,
+          opacity: 0.32,
           depthWrite: false,
           blending: THREE.AdditiveBlending,
           sizeAttenuation: true,
@@ -237,6 +262,7 @@ export default function Home() {
 
       const onResize = () => {
         renderer.setSize(host.clientWidth, host.clientHeight);
+        composer.setSize(host.clientWidth, host.clientHeight);
         camera.aspect = host.clientWidth / host.clientHeight;
         camera.updateProjectionMatrix();
       };
@@ -250,13 +276,14 @@ export default function Home() {
         logoRoot.rotation.y += ((Math.sin(t * 0.17) * 0.07 + pointer.x * 0.18) - logoRoot.rotation.y) * 0.04;
         logoRoot.position.y = -0.26 + Math.sin(t * 0.48) * 0.035;
         sparkles.rotation.z = Math.sin(t * 0.16) * 0.014;
-        redEdgeMaterial.opacity = 0.28 + (Math.sin(t * 0.77) + 1) * 0.07;
-        greenEdgeMaterial.opacity = 0.25 + (Math.sin(t * 0.69 + 2) + 1) * 0.06;
-        blueEdgeMaterial.opacity = 0.31 + (Math.sin(t * 0.84 + 4) + 1) * 0.07;
+        redEdgeMaterial.opacity = 0.4 + (Math.sin(t * 0.77) + 1) * 0.07;
+        greenEdgeMaterial.opacity = 0.36 + (Math.sin(t * 0.69 + 2) + 1) * 0.06;
+        blueEdgeMaterial.opacity = 0.44 + (Math.sin(t * 0.84 + 4) + 1) * 0.08;
         redLight.intensity = 14 + Math.sin(t * 0.72) * 4;
         greenLight.intensity = 12 + Math.sin(t * 0.61 + 1.4) * 3;
         blueLight.intensity = 16 + Math.sin(t * 0.83 + 2.1) * 4;
-        renderer.render(scene, camera);
+        rgbShiftPass.uniforms.amount.value = 0.0012 + (Math.sin(t * 0.47) + 1) * 0.00022;
+        composer.render();
         frame = requestAnimationFrame(render);
       };
       render();
@@ -271,6 +298,7 @@ export default function Home() {
           const materials = Array.isArray(renderable.material) ? renderable.material : renderable.material ? [renderable.material] : [];
           materials.forEach((material) => material.dispose());
         });
+        composer.dispose();
         renderer.dispose();
         environment.dispose();
         renderer.domElement.remove();
@@ -347,7 +375,7 @@ export default function Home() {
         </div>
 
         <div className="debug-panel material-panel" aria-hidden="true">
-          <b>D Prismatic Crystal</b><span>roughness <i style={{ width: "8%" }} /> 0.012</span><span>transmission <i style={{ width: "56%" }} /> 0.56</span><span>color <em style={{ background: "#13131a" }} /> {'{r:19, g:19, b:26}'}</span>
+          <b>D Optical Crystal</b><span>roughness <i style={{ width: "4%" }} /> 0.004</span><span>transmission <i style={{ width: "96%" }} /> 0.96</span><span>color <em style={{ background: "#edf8ff" }} /> {'{r:237, g:248, b:255}'}</span>
         </div>
         <div className="debug-panel quaternion-panel" aria-hidden="true">
           <b>MainLogo Quaternion</b><span className="quat-values">● &nbsp; .00&nbsp; .00&nbsp; .00&nbsp; 1.0</span><div className="quat-orbit"><i>X</i><i>Y</i><i>Z</i></div><button type="button" tabIndex={-1}>Reset Quaternion</button>
