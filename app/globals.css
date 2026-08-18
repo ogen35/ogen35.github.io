@@ -35,8 +35,8 @@ button { font: inherit; }
 
 .hero-word {
   position:absolute; left:6.7%; top:30.5%; z-index:-1; width:87%; color:#fff;
-  font-family:Arial, Helvetica, sans-serif; font-size:clamp(8.5rem, 24.4vw, 22rem); font-weight:900;
-  line-height:.78; letter-spacing:-.075em; white-space:nowrap; text-shadow:0 0 8px rgba(255,255,255,.5);
+  font-family:Arial, Helvetica, sans-serif; font-size:clamp(10rem, 30vw, 27rem); font-weight:900;
+  line-height:.78; letter-spacing:-.065em; white-space:nowrap; text-shadow:0 0 8px rgba(255,255,255,.5);
 }
 .hero-canvas { position:absolute; inset:0; z-index:0; opacity:0; transition:opacity .7s ease; }
 .hero-canvas.is-ready { opacity:1; }
@@ -153,7 +153,7 @@ button { font: inherit; }
   .main-nav, .contact-pill { display:none; }
   .sound { right:22px; }
   .section-rail { display:none; }
-  .hero-word { left:2%; top:36%; font-size:33vw; }
+  .hero-word { left:2%; top:36%; font-size:40vw; }
   .news-panel { left:24px; right:24px; bottom:24px; width:auto; min-width:0; }
   .news-panel p:nth-of-type(n+2), .debug-panel { display:none; }
   .hero-canvas { transform:scale(.9); }
