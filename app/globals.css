@@ -115,7 +115,28 @@ img { display: block; }
   white-space: nowrap;
   text-shadow: 0 0 9px rgba(255,255,255,.62), 0 0 38px rgba(74,117,255,.24);
 }
-.hero-canvas { position: absolute; inset: 0; z-index: 0; opacity: 0; transition: opacity .8s ease; }
+.hero-d-fallback {
+  position: absolute;
+  z-index: 0;
+  left: 50%;
+  top: 50%;
+  width: min(69vw, 820px);
+  height: min(82svh, 820px);
+  object-fit: contain;
+  transform: translate(-50%, -48%);
+  mix-blend-mode: screen;
+  opacity: .92;
+  pointer-events: none;
+  filter: saturate(1.6) contrast(1.08) drop-shadow(-16px 3px 18px rgba(42,118,255,.34)) drop-shadow(16px -4px 20px rgba(255,44,176,.28));
+  transition: opacity .8s ease, filter .8s ease;
+  animation: fallback-d-float 7s ease-in-out infinite;
+}
+.hero-d-fallback.is-model-ready { opacity: .3; filter: saturate(1.8) contrast(1.15) drop-shadow(0 0 20px rgba(102,167,255,.34)); }
+@keyframes fallback-d-float {
+  0%, 100% { transform: translate(-50%, -48%) rotate(-.35deg) scale(1); }
+  50% { transform: translate(-50%, -49.2%) rotate(.5deg) scale(1.012); }
+}
+.hero-canvas { position: absolute; inset: 0; z-index: 1; opacity: 0; pointer-events: none; transition: opacity .8s ease; }
 .hero-canvas.is-ready { opacity: 1; }
 .hero-canvas canvas { display: block; width: 100%; height: 100%; }
 .hero-kicker {
@@ -210,7 +231,11 @@ img { display: block; }
 .signals-stage { position: absolute; inset: 0; perspective: 1200px; }
 .signal-card { position: absolute; inset: 0; opacity: 0; transform: translate3d(14%,5%,0) rotateY(-12deg) scale(.86); transition: opacity .7s ease, transform .95s cubic-bezier(.2,.7,.1,1); pointer-events: none; }
 .signal-card.is-active { opacity: 1; transform: translate3d(0,0,0) rotateY(-2deg) scale(1); pointer-events: auto; }
-.signal-card > img { position: absolute; left: 28%; top: 14%; width: 49%; height: 61%; object-fit: cover; object-position: center 22%; filter: saturate(.9) contrast(1.08); box-shadow: 0 0 0 1px rgba(255,255,255,.28), 0 34px 100px rgba(0,0,0,.58), 0 0 60px rgba(57,118,255,.14); }
+.signal-image-button { position: absolute; left: 28%; top: 14%; width: 49%; height: 61%; padding: 0; overflow: hidden; color: #fff; border: 0; background: #05070d; cursor: pointer; box-shadow: 0 0 0 1px rgba(255,255,255,.28), 0 34px 100px rgba(0,0,0,.58), 0 0 60px rgba(57,118,255,.14); }
+.signal-image-button img { width: 100%; height: 100%; object-fit: cover; object-position: center 22%; filter: saturate(.9) contrast(1.08); transition: transform .8s cubic-bezier(.2,.7,.1,1), filter .45s ease; }
+.signal-image-button span { position: absolute; right: 14px; bottom: 13px; padding: 6px 8px; color: rgba(255,255,255,.74); border: 1px solid rgba(255,255,255,.35); background: rgba(2,3,8,.42); backdrop-filter: blur(9px); font-size: 8px; letter-spacing: .15em; }
+.signal-image-button:hover img, .signal-image-button:focus-visible img { transform: scale(1.025); filter: saturate(1.03) contrast(1.04); }
+.signal-image-button:focus-visible, .signal-controls button:focus-visible, .signal-dots button:focus-visible { outline: 2px solid #fff; outline-offset: 4px; }
 .signal-copy { position: absolute; left: 8%; bottom: 8%; width: 66%; text-shadow: 0 2px 14px #000; }
 .signal-copy time { font-size: 10px; letter-spacing: .28em; }
 .signal-copy h2 { margin: 12px 0 7px; font: 400 clamp(2rem, 3.3vw, 3.7rem)/1.04 Arial, sans-serif; letter-spacing: -.04em; }
@@ -218,9 +243,14 @@ img { display: block; }
 .signal-copy ul { display: flex; flex-wrap: wrap; gap: 7px; margin: 0; padding: 0; list-style: none; }
 .signal-copy li { border: 1px solid rgba(255,255,255,.52); border-radius: 999px; padding: 5px 11px; font-size: 9px; }
 .more-signals { position: absolute; right: 3.2%; bottom: 8%; font-size: 12px; letter-spacing: .12em; }
+.signal-controls { position: absolute; z-index: 5; right: 3.4%; bottom: 13%; display: flex; align-items: center; gap: 11px; }
+.signal-controls button { display: grid; place-items: center; width: 38px; height: 38px; padding: 0; color: #fff; border: 1px solid rgba(255,255,255,.48); border-radius: 50%; background: rgba(3,4,10,.32); backdrop-filter: blur(10px); cursor: pointer; transition: background .25s ease, color .25s ease, transform .25s ease; }
+.signal-controls button:hover { color: #05060a; background: #fff; transform: scale(1.06); }
+.signal-controls output { min-width: 52px; color: rgba(255,255,255,.7); font-size: 9px; letter-spacing: .12em; text-align: center; }
 .signal-dots { position: absolute; z-index: 4; right: 4.2%; top: 50%; display: grid; gap: 11px; }
-.signal-dots i { width: 7px; height: 7px; border: 1px solid #fff; border-radius: 50%; background: transparent; }
-.signal-dots i.is-active { background: #fff; box-shadow: 0 0 10px #fff; }
+.signal-dots button { width: 9px; height: 9px; padding: 0; border: 1px solid #fff; border-radius: 50%; background: transparent; cursor: pointer; transition: background .25s ease, transform .25s ease; }
+.signal-dots button:hover { transform: scale(1.45); }
+.signal-dots button.is-active { background: #fff; box-shadow: 0 0 10px #fff; }
 
 .profile-section { min-height: 112svh; color: #070b16; background: #edf5f9; display: grid; grid-template-columns: 52% 48%; }
 .profile-image-wrap { position: relative; margin: 6vw 0 6vw 7vw; overflow: hidden; background: #020307; box-shadow: 0 30px 80px rgba(10,25,70,.2); }
@@ -308,6 +338,7 @@ img { display: block; }
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   .manifest-orbit { animation: none; }
+  .hero-d-fallback { animation: none; }
   .signal-card, .live-slide, .archive-card img { transition: none; }
 }
 
@@ -322,14 +353,17 @@ img { display: block; }
   .news-panel { left: 24px; right: 24px; bottom: 24px; width: auto; min-width: 0; }
   .news-panel p:nth-of-type(n+2), .debug-panel { display: none; }
   .hero-canvas { transform: scale(.86); }
+  .hero-d-fallback { width: min(102vw, 720px); height: 72svh; transform: translate(-50%, -44%); animation: none; }
   .hero-bubble:nth-child(1), .hero-bubble:nth-child(7) { width: 92px; }
   .hero-bubble:nth-child(3), .hero-bubble:nth-child(5) { display: none; }
 
   .signals-section { height: 285svh; }
   .signals-word { top: 29%; font-size: 38vw; }
-  .signal-card > img { left: 7%; top: 18%; width: 86%; height: 49%; }
+  .signal-image-button { left: 7%; top: 18%; width: 86%; height: 49%; }
   .signal-copy { left: 7%; bottom: 9%; width: 86%; }
   .signal-copy h2 { font-size: 1.85rem; }
+  .signal-controls { right: 7%; bottom: 3.4%; }
+  .signal-dots { right: 7%; top: 14%; grid-auto-flow: column; }
   .more-signals { display: none; }
 
   .profile-section { min-height: 0; display: block; padding: 72px 20px 84px; }

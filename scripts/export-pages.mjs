@@ -32,7 +32,9 @@ async function waitForServer() {
 }
 
 try {
-  const html = (await waitForServer()).replaceAll(localOrigin, publicOrigin);
+  const html = (await waitForServer())
+    .replaceAll(localOrigin, publicOrigin)
+    .replaceAll('"initialCacheKind":"dynamic"', '"initialCacheKind":"static"');
   writeFileSync(resolve(outputDir, "index.html"), html);
   writeFileSync(resolve(outputDir, "404.html"), html);
   writeFileSync(resolve(outputDir, ".nojekyll"), "");
