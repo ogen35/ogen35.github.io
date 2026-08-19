@@ -65,6 +65,17 @@ export default function Home() {
   const [activeLive, setActiveLive] = useState(0);
   const [activeSection, setActiveSection] = useState("TOP");
 
+  const selectSignal = (index: number) => {
+    setActiveSignal((index + signals.length) % signals.length);
+  };
+
+  useEffect(() => {
+    document.documentElement.dataset.idoiReact = "ready";
+    return () => {
+      delete document.documentElement.dataset.idoiReact;
+    };
+  }, []);
+
   useEffect(() => {
     let disposed = false;
     let frame = 0;
@@ -325,7 +336,12 @@ export default function Home() {
       };
     }
 
-    mountScene();
+    mountScene().catch((error) => {
+      if (!disposed) {
+        setReady(false);
+        console.error("IDOI crystal model could not start; using the image fallback.", error);
+      }
+    });
     return () => {
       disposed = true;
       cleanup();
@@ -457,6 +473,12 @@ export default function Home() {
           {Array.from({ length: 10 }, (_, index) => <i className="hero-bubble" key={index} />)}
         </div>
         <div className="hero-word" aria-hidden="true">IDOI</div>
+        <img
+          className={`hero-d-fallback ${ready ? "is-model-ready" : ""}`}
+          src="/assets/idoi/symbol-d.png"
+          alt=""
+          aria-hidden="true"
+        />
         <div ref={canvasHostRef} className={`hero-canvas ${ready ? "is-ready" : ""}`} aria-label="Interactive transparent crystal letter D" />
 
         <div className="hero-kicker">
@@ -485,7 +507,17 @@ export default function Home() {
           <div className="signals-stage">
             {signals.map((signal, index) => (
               <article className={`signal-card ${activeSignal === index ? "is-active" : ""}`} key={signal.title} aria-hidden={activeSignal !== index}>
-                <img src={signal.image} alt={signal.title} />
+                <button
+                  className="signal-image-button"
+                  type="button"
+                  data-signal-next
+                  tabIndex={activeSignal === index ? 0 : -1}
+                  aria-label={`查看下一张：${signals[(index + 1) % signals.length].title}`}
+                  onClick={() => selectSignal(index + 1)}
+                >
+                  <img src={signal.image} alt={signal.title} />
+                  <span>CLICK / NEXT</span>
+                </button>
                 <div className="signal-copy">
                   <time>{signal.date}</time>
                   <h2 id={index === 0 ? "signals-heading" : undefined}>{signal.title}</h2>
@@ -496,8 +528,23 @@ export default function Home() {
             ))}
             <a className="more-signals" href="#archive">Open Archive ↗</a>
           </div>
-          <div className="signal-dots" aria-label="Selected signal">
-            {signals.map((signal, index) => <i className={activeSignal === index ? "is-active" : ""} key={signal.title} />)}
+          <div className="signal-controls" aria-label="轮播控制">
+            <button className="signal-prev" type="button" aria-label="上一张" onClick={() => selectSignal(activeSignal - 1)}>←</button>
+            <output aria-live="polite">{String(activeSignal + 1).padStart(2, "0")} / {String(signals.length).padStart(2, "0")}</output>
+            <button className="signal-next" type="button" aria-label="下一张" onClick={() => selectSignal(activeSignal + 1)}>→</button>
+          </div>
+          <div className="signal-dots" aria-label="选择轮播图片">
+            {signals.map((signal, index) => (
+              <button
+                type="button"
+                className={activeSignal === index ? "is-active" : ""}
+                key={signal.title}
+                data-signal-index={index}
+                aria-label={`切换到 ${signal.title}`}
+                aria-current={activeSignal === index ? "true" : undefined}
+                onClick={() => selectSignal(index)}
+              />
+            ))}
           </div>
         </div>
       </section>
